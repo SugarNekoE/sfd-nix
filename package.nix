@@ -67,6 +67,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = source;
 
   patches = [
+    ./patches/nix-login-item-launcher.patch
     ./patches/nix-resources-path.patch
     ./patches/nix-runtime-directory.patch
     ./patches/use-nix-pnpm.patch
@@ -163,6 +164,7 @@ stdenv.mkDerivation (finalAttrs: {
     makeWrapper ${lib.getExe electron} "$out/bin/sing-box" \
       --inherit-argv0 \
       --set ELECTRON_FORCE_IS_PACKAGED 1 \
+      --set SING_BOX_LAUNCHER "$out/bin/sing-box" \
       --add-flags "$out/share/sing-box-for-desktop/resources/app.asar" \
       --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}"
 
