@@ -8,6 +8,8 @@
 let
   cfg = config.programs.sing-box-for-desktop;
   daemon = "${cfg.package}/share/sing-box-for-desktop/resources/daemon/sing-box-daemon";
+  runtimeDirectory = "sing-box-daemon";
+  socketPath = "/run/${runtimeDirectory}/sing-box.socket";
 in
 {
   options.programs.sing-box-for-desktop = {
@@ -47,7 +49,9 @@ in
 
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${daemon} run --working-directory /var/lib/sing-box-daemon --socket /run/sing-box.socket";
+        ExecStart = "${daemon} run --working-directory /var/lib/sing-box-daemon --socket ${socketPath}";
+        RuntimeDirectory = runtimeDirectory;
+        RuntimeDirectoryMode = "0755";
         StateDirectory = "sing-box-daemon";
         StateDirectoryMode = "0700";
         UMask = "0077";

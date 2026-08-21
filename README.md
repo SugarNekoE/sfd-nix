@@ -35,7 +35,10 @@ The standalone package contains the UI and its matching daemon, but a normal use
 }
 ```
 
-This installs the desktop entry and PolicyKit action, enables `pkexec`, and starts `sing-box-daemon.service`. The daemon socket is `/run/sing-box.socket`; daemon state is stored in `/var/lib/sing-box-daemon`.
+This installs the desktop entry and PolicyKit action, enables `pkexec`, and
+starts `sing-box-daemon.service`. The daemon socket is
+`/run/sing-box-daemon/sing-box.socket`; daemon state is stored in
+`/var/lib/sing-box-daemon`.
 
 ## Overlay
 

@@ -68,6 +68,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   patches = [
     ./patches/nix-resources-path.patch
+    ./patches/nix-runtime-directory.patch
     ./patches/use-nix-pnpm.patch
   ];
 
