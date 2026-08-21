@@ -68,6 +68,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   patches = [
     ./patches/nix-login-item-launcher.patch
+    ./patches/nix-managed-configuration.patch
     ./patches/nix-resources-path.patch
     ./patches/nix-runtime-directory.patch
     ./patches/use-nix-pnpm.patch
@@ -102,6 +103,8 @@ stdenv.mkDerivation (finalAttrs: {
   # it has registry access. The actual build then trusts that verified lockfile
   # so pnpm does not try to re-fetch registry metadata in the offline sandbox.
   postPatch = ''
+    cp ${./files/managedConfiguration.ts} src/main/managedConfiguration.ts
+
     substituteInPlace pnpm-workspace.yaml dashboard/pnpm-workspace.yaml \
       --replace-fail \
         'trustPolicyIgnoreAfter: 259200' \

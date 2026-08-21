@@ -38,10 +38,21 @@
         }
       );
 
-      checks = forAllSystems (system: {
-        package = self.packages.${system}.sing-box-for-desktop;
-        daemon = self.packages.${system}.sing-box-daemon;
-      });
+      checks = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          package = self.packages.${system}.sing-box-for-desktop;
+          daemon = self.packages.${system}.sing-box-daemon;
+          module = pkgs.callPackage ./tests/module-check.nix {
+            nixosModule = ./nixos-module.nix;
+            inherit (nixpkgs.lib) nixosSystem;
+            package = self.packages.${system}.sing-box-for-desktop;
+          };
+        }
+      );
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
 

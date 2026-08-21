@@ -40,6 +40,64 @@ starts `sing-box-daemon.service`. The daemon socket is
 `/run/sing-box-daemon/sing-box.socket`; daemon state is stored in
 `/var/lib/sing-box-daemon`.
 
+## Declarative settings
+
+Desktop preferences and local JSON profiles can be managed by the NixOS
+module. Every setting defaults to `null`, which preserves the value managed by
+the application. An explicit value is reapplied whenever the desktop process
+starts.
+
+```nix
+programs.sing-box-for-desktop = {
+  enable = true;
+
+  settings = {
+    startAtLogin = true;
+    tray = {
+      enable = true;
+      keepInBackground = true;
+    };
+    language = "en"; # auto, en, zh-Hans, zh-Hant, fa, or ru
+    appearance = "dark"; # auto, light, or dark
+    theme = "blue"; # preset or lowercase #rrggbb
+
+    terminal = {
+      lightTheme = "Alabaster";
+      darkTheme = "Afterglow";
+      fontFamily = "Iosevka";
+      fontSize = 14;
+      alwaysShowSymbolBar = true;
+
+      # Set the corresponding theme name to "" to select a custom theme.
+      darkCustomTheme = {
+        background = "#101010";
+        foreground = "#eeeeee";
+        cursor = "#eeeeee";
+      };
+    };
+
+    core = {
+      insecureMode = false;
+      disableDeprecatedWarnings = true;
+    };
+  };
+
+  profiles = [
+    {
+      name = "Default";
+      configuration = builtins.fromJSON (builtins.readFile ./sing-box.json);
+    }
+  ];
+  defaultProfile = "Default";
+};
+```
+
+Setting `profiles` to a list makes that list authoritative; `profiles = [ ];`
+clears user profiles on launch, while the default `null` leaves them untouched.
+Declarative profile data is copied through the world-readable Nix store and
+must not contain secrets. See [configuration storage](docs/configuration-storage.md)
+for the exact database, file, and reconciliation behavior.
+
 ## Overlay
 
 The default overlay exposes `pkgs.sing-box-for-desktop`:
