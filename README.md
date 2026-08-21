@@ -93,4 +93,11 @@ package outputs. The Electron UI, both pnpm dependency graphs, the Go daemon,
 and Cronet are built or fetched through fixed-output Nix derivations; the build
 does not download upstream `.deb` or RPM artifacts.
 
-The packaged upstream projects are licensed under GPL-3.0-or-later. See their repositories for the complete license text.
+## License
+
+The `sfd-nix` packaging and module code in this repository is licensed under
+the GNU General Public License v3.0 or later (`GPL-3.0-or-later`). See
+[LICENSE](LICENSE) for the complete license text.
+
+Packaged upstream projects retain their own copyright notices and license
+terms. See their repositories for details.
