@@ -1,4 +1,4 @@
-# sing-box-for-desktop for Nix
+# sfd-nix
 
 This flake packages [SagerNet/sing-box-for-desktop](https://github.com/SagerNet/sing-box-for-desktop), the experimental Linux desktop client for sing-box.
 
@@ -7,8 +7,8 @@ The build is pinned to desktop version `1.14.0-beta.17` at revision `5536324bb2b
 ## Run or build
 
 ```console
-nix build .#sing-box-for-desktop
-nix run .
+nix build --accept-flake-config .#sing-box-for-desktop
+nix run --accept-flake-config .
 ```
 
 The package currently supports `x86_64-linux` and `aarch64-linux`. It uses the
@@ -50,6 +50,34 @@ Using only the overlay does not configure the privileged daemon. Prefer the NixO
 
 ## Development
 
+Enter the reproducible development shell with `devenv shell` (or allow the
+included `.envrc`). It provides Cachix, Just, and uv. Common commands are
+available through the `justfile`:
+
+```console
+just check
+just check-all
+just build
+just run
+```
+
+## Binary cache
+
+The flake advertises the public `sfd-nix.cachix.org` substituter and its signing
+key. Pass `--accept-flake-config` when invoking the flake directly so Nix may use
+it. The devenv shell configures the same cache automatically.
+
+To upload validated desktop and daemon outputs, authenticate with a per-cache
+write token using `CACHIX_AUTH_TOKEN` or `cachix authtoken`, then run:
+
+```console
+just cache-doctor
+just cache-push
+```
+
+Never commit a Cachix auth token or private signing key. `just cache-push` first
+runs the native flake checks, then pushes both release closures to the cache.
+
 Useful outputs are:
 
 - `packages.<system>.sing-box-for-desktop` — the complete desktop package
@@ -57,6 +85,9 @@ Useful outputs are:
 - `nixosModules.default` — declarative desktop/service integration
 - `overlays.default` — the package overlay
 
-Run `nix flake check` to build both package outputs. The Electron UI, both pnpm dependency graphs, the Go daemon, and Cronet are built or fetched through fixed-output Nix derivations; the build does not download upstream `.deb` or RPM artifacts.
+Run `just check` (or `nix flake check --accept-flake-config`) to build both
+package outputs. The Electron UI, both pnpm dependency graphs, the Go daemon,
+and Cronet are built or fetched through fixed-output Nix derivations; the build
+does not download upstream `.deb` or RPM artifacts.
 
 The packaged upstream projects are licensed under GPL-3.0-or-later. See their repositories for the complete license text.

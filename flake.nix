@@ -1,5 +1,12 @@
 {
-  description = "Nix packaging for sing-box-for-desktop";
+  description = "sfd-nix: Nix packaging for sing-box-for-desktop";
+
+  nixConfig = {
+    extra-substituters = [ "https://sfd-nix.cachix.org" ];
+    extra-trusted-public-keys = [
+      "sfd-nix.cachix.org-1:SX5EpvFvgFZXgG94/0fX1L+lUWQ90dPq0Ieor7/rDig="
+    ];
+  };
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/master";
 

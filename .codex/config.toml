@@ -1,4 +1,4 @@
 [mcp_servers.nixos]
-command = "/nix/var/nix/profiles/default/bin/nix"
-args = ["run", "github:utensils/mcp-nixos/v2.4.3", "--"]
+command = "uvx"
+args = ["mcp-nixos"]
 startup_timeout_sec = 120
