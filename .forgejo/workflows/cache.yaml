@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: nixos-latest
+    env:
+      NIX_CONFIG: "experimental-features = nix-command flakes"
 
     steps:
       - name: Install Node.js action runtime
