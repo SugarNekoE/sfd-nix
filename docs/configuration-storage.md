@@ -52,7 +52,16 @@ removes `$XDG_CONFIG_HOME/autostart/sing-box.desktop` (falling back to
 wrapper makes the application report the declarative value and removes any
 per-user entry that could override it. The NixOS module installs a system-wide
 `/etc/xdg/autostart/sing-box.desktop` only when the value is true, so the first
-launch does not need to happen manually and false leaves no stale user override.
+launch on a clean installation does not need to happen manually and false
+leaves no stale user override.
+
+An existing per-user entry has precedence over the system-wide entry with the
+same name. After switching from an upstream package or an older sfd-nix build,
+launch the Nix-packaged application once to migrate an enabled user entry to
+the current Nix wrapper. Alternatively, remove
+`~/.config/autostart/sing-box.desktop` before the next login. This one-time
+step is required because a system module cannot override a user-owned XDG
+autostart entry before the application runs.
 
 ## Privileged daemon
 

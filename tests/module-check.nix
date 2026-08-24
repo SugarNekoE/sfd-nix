@@ -121,6 +121,8 @@ pkgs.runCommand "sing-box-for-desktop-module-check"
     wrapper=${configuredPackage}/bin/sing-box
     grep -F "SING_BOX_LAUNCHER='${configuredPackage}/bin/sing-box'" "$wrapper"
     grep -F "SING_BOX_MANAGED_OPEN_AT_LOGIN='true'" "$wrapper"
+    grep -F 'export SING_BOX_LAUNCHER=''${SING_BOX_LAUNCHER-' \
+      "${configuredPackage}/bin/.sing-box-wrapped"
 
     managed_path="$(${pkgs.gnused}/bin/sed -n \
       "s/^export SING_BOX_MANAGED_CONFIGURATION='\([^']*\)'/\1/p" \

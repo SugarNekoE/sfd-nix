@@ -24,3 +24,16 @@ diff --git a/src/main/loginItem.ts b/src/main/loginItem.ts
        "Icon=sing-box",
        "Terminal=false",
        "StartupNotify=false",
+@@ -85,6 +92,12 @@ export function setOpenAtLogin(value: boolean) {
+ }
+ 
+ export function migrateLoginItem() {
++  if (process.platform === "linux") {
++    if (linuxLoginItemEnabled()) {
++      setLinuxOpenAtLogin(true);
++    }
++    return;
++  }
+   if (process.platform !== "win32") {
+     return;
+   }

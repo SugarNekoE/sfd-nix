@@ -16,7 +16,7 @@
 }:
 
 let
-  electronVersion = "43.3.0";
+  electronVersion = "43.4.0";
   electronPlatform =
     {
       x86_64-linux = "linux-x64";
@@ -25,8 +25,8 @@ let
     .${stdenv.hostPlatform.system};
   electronHash =
     {
-      x86_64-linux = "f4987e9f045e46b117f0805d6ba4dc524e2abb2c2e33660f175bb39564bd3dae";
-      aarch64-linux = "3e89a62c345d8171bf54f77df5b3d8216c492847eed00ae59cadd78d6f5535f7";
+      x86_64-linux = "7c5f7918bcae74a05a814543940eb28469c055edaa3cfcf41d0ff1787b314c52";
+      aarch64-linux = "17021d48739857106a26dd95bf749f95b89ae924955c3c7e7ff5a3f06251ac14";
     }
     .${stdenv.hostPlatform.system};
   electron = electron_43-bin.overrideAttrs (
@@ -43,13 +43,13 @@ let
   );
   pnpm = pnpm_11.override { nodejs-slim = nodejs-slim_26; };
   daemon = callPackage ./sing-box-daemon.nix { };
-  version = "1.14.0-beta.17";
+  version = "1.14.0-rc.1";
   source = fetchFromGitHub {
     owner = "SagerNet";
     repo = "sing-box-for-desktop";
-    rev = "5536324bb2b2466a0817ad6e4a1313d0a6486910";
+    rev = "f02201df1415667e7e0e65116746c1989d958f7e";
     fetchSubmodules = true;
-    hash = "sha256-aia+jPRQPXwdRH0T132TTzU4klzneUm/Iw6LZWsWXQo=";
+    hash = "sha256-DzCX3EtOHwD6FosvAmh9MM2aVYMgvxUz5yi+4F0GEEQ=";
   };
   dashboardPnpmDeps = fetchPnpmDeps {
     pname = "sing-box-for-desktop-dashboard";
@@ -57,7 +57,7 @@ let
     src = source;
     sourceRoot = "source/dashboard";
     fetcherVersion = 4;
-    hash = "sha256-QbcvSwJh5v+h4rYPAzGAViQX/LRQAlQdA+oXrp5zq0o=";
+    hash = "sha256-MCld/J2LBtAz2bS00ICjCQN/QPXlLDKwzEGtFwlEl8c=";
   };
 in
 stdenv.mkDerivation (finalAttrs: {
@@ -83,7 +83,7 @@ stdenv.mkDerivation (finalAttrs: {
       ;
     inherit pnpm;
     fetcherVersion = 4;
-    hash = "sha256-45ejBGIQyMJsTG8Ul2eu/cAuormA2NpG3idgaLEJS8I=";
+    hash = "sha256-MJdf1+aTWCmS0l9XO7pAne3ErXhxGmT5xoriSLIUXEk=";
   };
 
   nativeBuildInputs = [
@@ -96,7 +96,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   env = {
     ELECTRON_SKIP_BINARY_DOWNLOAD = 1;
-    SOURCE_DATE_EPOCH = "1786957667";
+    SOURCE_DATE_EPOCH = "1787538698";
   };
 
   # The dependency FOD enforces upstream's release-age and trust policies while
@@ -167,7 +167,7 @@ stdenv.mkDerivation (finalAttrs: {
     makeWrapper ${lib.getExe electron} "$out/bin/sing-box" \
       --inherit-argv0 \
       --set ELECTRON_FORCE_IS_PACKAGED 1 \
-      --set SING_BOX_LAUNCHER "$out/bin/sing-box" \
+      --set-default SING_BOX_LAUNCHER "$out/bin/sing-box" \
       --add-flags "$out/share/sing-box-for-desktop/resources/app.asar" \
       --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}"
 
@@ -210,7 +210,7 @@ stdenv.mkDerivation (finalAttrs: {
   passthru = {
     inherit daemon dashboardPnpmDeps;
     sourceRevision = finalAttrs.src.rev;
-    dashboardRevision = "4f29dcc7b93292c6311e92dc367670dd594db794";
+    dashboardRevision = "564dd76b2382af2fb72aee9fcc95af75db693d1a";
   };
 
   meta = {

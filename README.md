@@ -2,7 +2,7 @@
 
 This flake packages [SagerNet/sing-box-for-desktop](https://github.com/SagerNet/sing-box-for-desktop), the experimental Linux desktop client for sing-box.
 
-The build is pinned to desktop version `1.14.0-beta.17` at revision `5536324bb2b2466a0817ad6e4a1313d0a6486910`. Upstream has not published desktop tags or releases yet, so the exact source revision and its recursive dashboard submodules are pinned in the package.
+The build is pinned to desktop version `1.14.0-rc.1` at revision `f02201df1415667e7e0e65116746c1989d958f7e`. Upstream has not published desktop tags or releases yet, so the exact source revision and its recursive dashboard submodules are pinned in the package.
 
 ## Run or build
 
@@ -12,7 +12,7 @@ nix run --accept-flake-config .
 ```
 
 The package currently supports `x86_64-linux` and `aarch64-linux`. It uses the
-upstream-matched Node.js 26.7, Electron 43.3, and sing-box 1.14.0-beta.17
+upstream-matched Node.js 26.7, Electron 43.4, and sing-box 1.14.0-rc.1
 toolchain rather than repacking an upstream distribution archive.
 
 The standalone package contains the UI and its matching daemon, but a normal user cannot install the required system service. On NixOS, use the module for a working client:
