@@ -11,6 +11,13 @@ jobs:
     runs-on: nixos-latest
 
     steps:
+      - name: Install Node.js action runtime
+        shell: sh
+        run: |
+          set -eu
+          node_path="$(nix build --no-link --print-out-paths nixpkgs#nodejs_24)"
+          echo "$node_path/bin" >> "$FORGEJO_PATH"
+
       - name: Check out repository
         uses: https://data.forgejo.org/actions/checkout@v6
 
