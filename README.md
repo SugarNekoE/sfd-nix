@@ -85,7 +85,7 @@ programs.sing-box-for-desktop = {
   profiles = [
     {
       name = "Default";
-      configuration = builtins.fromJSON (builtins.readFile ./sing-box.json);
+      configurationPath = "/run/secrets/sing-box.json";
     }
   ];
   defaultProfile = "Default";
@@ -94,8 +94,10 @@ programs.sing-box-for-desktop = {
 
 Setting `profiles` to a list makes that list authoritative; `profiles = [ ];`
 clears user profiles on launch, while the default `null` leaves them untouched.
-Declarative profile data is copied through the world-readable Nix store and
-must not contain secrets. See [configuration storage](docs/configuration-storage.md)
+Each `configurationPath` must be an absolute runtime path readable by the
+desktop user. Only the path is placed in the Nix store; the JSON contents are
+read when the application launches, so secret-bearing profiles can come from a
+runtime secret manager. See [configuration storage](docs/configuration-storage.md)
 for the exact database, file, and reconciliation behavior.
 
 ## Overlay

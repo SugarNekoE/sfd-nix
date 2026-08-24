@@ -19,13 +19,13 @@ let
         description = "Profile display name and stable declarative identifier.";
       };
 
-      configuration = lib.mkOption {
-        type = lib.types.attrs;
-        default = { };
+      configurationPath = lib.mkOption {
+        type = lib.types.strMatching "/.+";
         description = ''
-          sing-box profile configuration represented as a Nix attribute set.
-          The value is serialized to JSON in the world-readable Nix store, so
-          it must not contain passwords, tokens, or other secrets.
+          Absolute runtime path to a sing-box JSON configuration. Only the path
+          is stored in the Nix store; the desktop process reads the file when it
+          starts. Use a plain string such as /run/secrets/sing-box.json rather
+          than a Nix path literal, which would copy the file into the Nix store.
         '';
       };
     };
@@ -78,7 +78,7 @@ let
   // lib.optionalAttrs (cfg.profiles != null) {
     profiles = map (profile: {
       id = profileId profile.name;
-      inherit (profile) name configuration;
+      inherit (profile) name configurationPath;
     }) configuredProfiles;
   }
   // lib.optionalAttrs (cfg.defaultProfile != null) {
@@ -253,8 +253,8 @@ in
       default = null;
       description = ''
         Ordered declarative profile list. Null preserves all user-managed
-        profiles; a list replaces them on every application launch. Profile
-        JSON is copied from the Nix store and must not contain secrets.
+        profiles; a list replaces them on every application launch. Each
+        profile configuration is read from its runtime configurationPath.
       '';
     };
 

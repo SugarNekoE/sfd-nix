@@ -88,11 +88,15 @@ If `profiles` is `null`, all existing profiles remain user-managed. If it is a
 list (including an empty list), that list is authoritative on every launch:
 metadata and JSON files not present in the list are removed. Profile IDs are
 stable SHA-256 hashes of their names, and `defaultProfile` refers to a profile
-by name.
+by name. Each profile's `configurationPath` is an absolute runtime path. The
+desktop process reads and validates that file as a JSON object on launch, then
+writes the reconciled profile copy with mode `0600` in its user-data directory.
 
 Changes made through the UI after startup remain effective until the next
 application launch, when explicitly managed values are applied again.
 
-Nix store paths are readable by local users. Declarative profile JSON and
-custom terminal themes must therefore not contain secrets. Keep credentials in
-runtime-managed configuration or a separate secret-management mechanism.
+Nix store paths are readable by local users. The generated managed configuration
+contains profile source path names but not their JSON contents. Keep profile
+files containing credentials in a runtime secret manager and grant the desktop
+user read access. Custom terminal themes are still serialized into the Nix store
+and must not contain secrets.

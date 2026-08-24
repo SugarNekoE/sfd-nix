@@ -7,7 +7,7 @@ import {
   rmSync,
   writeFileSync,
 } from "node:fs";
-import { join } from "node:path";
+import { isAbsolute, join } from "node:path";
 
 import {
   preferenceSnapshot,
@@ -20,7 +20,7 @@ import { setOpenAtLogin } from "./loginItem";
 interface ManagedProfile {
   id: string;
   name: string;
-  configuration: Record<string, unknown>;
+  configurationPath: string;
 }
 
 interface ManagedConfiguration {
@@ -59,13 +59,13 @@ function parseManagedProfile(value: unknown): ManagedProfile {
   if (typeof value.name !== "string" || value.name === "") {
     throw new Error("managed profile has an invalid name");
   }
-  if (!isRecord(value.configuration)) {
-    throw new Error(`managed profile ${value.name} has an invalid configuration`);
+  if (typeof value.configurationPath !== "string" || !isAbsolute(value.configurationPath)) {
+    throw new Error(`managed profile ${value.name} has an invalid configuration path`);
   }
   return {
     id: value.id,
     name: value.name,
-    configuration: value.configuration,
+    configurationPath: value.configurationPath,
   };
 }
 
@@ -157,8 +157,12 @@ function writeProfile(profile: ManagedProfile): void {
   mkdirSync(directory, { recursive: true });
   const path = join(directory, `${profile.id}.json`);
   const temporaryPath = `${path}.${crypto.randomUUID()}.tmp`;
+  const configuration: unknown = JSON.parse(readFileSync(profile.configurationPath, "utf8"));
+  if (!isRecord(configuration)) {
+    throw new Error(`managed profile ${profile.name} configuration must be a JSON object`);
+  }
   try {
-    writeFileSync(temporaryPath, `${JSON.stringify(profile.configuration, null, 2)}\n`, {
+    writeFileSync(temporaryPath, `${JSON.stringify(configuration, null, 2)}\n`, {
       mode: 0o600,
     });
     renameSync(temporaryPath, path);

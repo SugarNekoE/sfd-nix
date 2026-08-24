@@ -52,15 +52,11 @@ let
           profiles = [
             {
               name = "Default";
-              configuration = {
-                log.level = "info";
-                inbounds = [ ];
-                outbounds = [ ];
-              };
+              configurationPath = "/run/secrets/sing-box-default.json";
             }
             {
               name = "Work";
-              configuration.log.level = "warn";
+              configurationPath = "/run/secrets/sing-box-work.json";
             }
           ];
           defaultProfile = "Default";
@@ -156,16 +152,12 @@ pkgs.runCommand "sing-box-for-desktop-module-check"
         .selectedProfileId == $defaultProfileId and
         (.profiles | length) == 2 and
         .profiles[0] == {
-          "configuration": {
-            "inbounds": [],
-            "log": { "level": "info" },
-            "outbounds": []
-          },
+          "configurationPath": "/run/secrets/sing-box-default.json",
           "id": $defaultProfileId,
           "name": "Default"
         } and
         .profiles[1] == {
-          "configuration": { "log": { "level": "warn" } },
+          "configurationPath": "/run/secrets/sing-box-work.json",
           "id": $workProfileId,
           "name": "Work"
         }
