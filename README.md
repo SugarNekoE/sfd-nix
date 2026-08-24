@@ -216,6 +216,12 @@ just cache-push
 Never commit a Cachix auth token or private signing key. `just cache-push` first
 runs the native flake checks, then pushes both release closures to the cache.
 
+The Forgejo workflow in `.forgejo/workflows/cache.yaml` performs the same
+validation and builds automatically on pushes to `main` using a runner labeled
+`nixos-latest`. Add a per-cache write token as the repository Actions secret
+`CACHIX_AUTH_TOKEN`; the workflow passes it directly to Cachix and never stores
+it in the repository.
+
 Useful outputs are:
 
 - `packages.<linux-system>.sing-box-for-desktop` — the Linux desktop package
