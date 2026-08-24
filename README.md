@@ -100,6 +100,48 @@ read when the application launches, so secret-bearing profiles can come from a
 runtime secret manager. See [configuration storage](docs/configuration-storage.md)
 for the exact database, file, and reconciliation behavior.
 
+### Secret profile permissions
+
+If `configurationPath` points to a file decrypted by sops-nix, create a
+dedicated `sing-box` group and explicitly grant the desktop user access:
+
+```nix
+{ config, ... }:
+
+{
+  users.groups.sing-box = { };
+  users.users.alice.extraGroups = [ "sing-box" ];
+
+  sops.secrets."sing-box-profile" = {
+    group = "sing-box";
+    mode = "0440";
+  };
+
+  programs.sing-box-for-desktop.profiles = [
+    {
+      name = "Default";
+      configurationPath = config.sops.secrets."sing-box-profile".path;
+    }
+  ];
+}
+```
+
+Replace `alice` with the user who runs the desktop application, then start a
+new login session so the supplementary group membership takes effect. Do not
+make a secret world-readable.
+
+For a configuration extracted into another restricted directory, assign the
+file to the `sing-box` group with read permission (`0440`). Every parent
+directory must also grant the group search (`x`) permission, for example mode
+`0750`; access to the file alone is insufficient if the user cannot traverse
+its directory. Apply the equivalent of:
+
+```console
+sudo chgrp sing-box /restricted/directory /restricted/directory/config.json
+sudo chmod 0750 /restricted/directory
+sudo chmod 0440 /restricted/directory/config.json
+```
+
 ## Overlay
 
 The default overlay exposes `pkgs.sing-box-for-desktop`:
