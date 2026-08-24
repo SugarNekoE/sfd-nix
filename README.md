@@ -1,8 +1,13 @@
 # sfd-nix
 
-This flake packages [SagerNet/sing-box-for-desktop](https://github.com/SagerNet/sing-box-for-desktop), the experimental Linux desktop client for sing-box.
+This flake packages the official sing-box desktop clients:
 
-The build is pinned to desktop version `1.14.0-rc.1` at revision `f02201df1415667e7e0e65116746c1989d958f7e`. Upstream has not published desktop tags or releases yet, so the exact source revision and its recursive dashboard submodules are pinned in the package.
+- [SagerNet/sing-box-for-desktop](https://github.com/SagerNet/sing-box-for-desktop) on Linux
+- [SagerNet/sing-box-for-apple](https://github.com/SagerNet/sing-box-for-apple) on macOS
+
+Both packages match sing-box `1.14.0-rc.1`. The Linux client is pinned to
+revision `f02201df1415667e7e0e65116746c1989d958f7e`; the Apple client matches
+revision `becbc5fdaa08bc5bebe810f95df2ff9638ad542f`.
 
 ## Run or build
 
@@ -11,15 +16,15 @@ nix build --accept-flake-config .#sing-box-for-desktop
 nix run --accept-flake-config .
 ```
 
-The package currently supports `x86_64-linux` and `aarch64-linux`. It uses the
-upstream-matched Node.js 26.7, Electron 43.4, and sing-box 1.14.0-rc.1
-toolchain rather than repacking an upstream distribution archive.
+On `x86_64-linux` and `aarch64-linux`, the package uses the upstream-matched
+Node.js 26.7, Electron 43.4, and sing-box 1.14.0-rc.1 toolchain. The following
+NixOS module and declarative settings apply only to this Linux package.
 
 The standalone package contains the UI and its matching daemon, but a normal user cannot install the required system service. On NixOS, use the module for a working client:
 
 ```nix
 {
-  inputs.sfd-nix.url = "github:YOUR-USER/sfd-nix";
+  inputs.sfd-nix.url = "git+https://forge.asnk.io/sugar/sfd-nix";
 
   outputs = { nixpkgs, sfd-nix, ... }: {
     nixosConfigurations.my-host = nixpkgs.lib.nixosSystem {
@@ -39,6 +44,31 @@ This installs the desktop entry and PolicyKit action, enables `pkexec`, and
 starts `sing-box-daemon.service`. The daemon socket is
 `/run/sing-box-daemon/sing-box.socket`; daemon state is stored in
 `/var/lib/sing-box-daemon`.
+
+## macOS
+
+The Darwin output supports Apple Silicon (`aarch64-darwin`) and contains the
+official signed and notarized `SFM` standalone client. It deliberately does not
+reuse the Linux patches, daemon, declarative settings, NixOS module, or any
+nix-darwin/Home Manager integration.
+
+The Apple app cannot be built into a functional client without Apple-issued
+Network Extension and System Extension entitlements, provisioning profiles,
+Developer ID certificates, and notarization. The derivation therefore extracts
+upstream's signed `SFM.app` without modifying its Mach-O files and retains the
+original installer package. For a functional system installation, use the
+installer rather than relying on an application symlink into the Nix store:
+
+```console
+nix build --accept-flake-config .#sing-box-for-apple
+sudo /usr/sbin/installer \
+  -pkg result/share/sing-box-for-apple/SFM.pkg \
+  -target /
+```
+
+The extracted app is also available at `result/Applications/SFM.app`. The
+installer requires macOS 13 or newer. Intel macOS is not exposed because the
+currently pinned nixpkgs revision no longer supports `x86_64-darwin`.
 
 ## Declarative settings
 
@@ -144,14 +174,17 @@ sudo chmod 0440 /restricted/directory/config.json
 
 ## Overlay
 
-The default overlay exposes `pkgs.sing-box-for-desktop`:
+The default overlay exposes `pkgs.sing-box-for-desktop` on every supported
+platform and also exposes `pkgs.sing-box-for-apple` on Darwin:
 
 ```nix
 nixpkgs.overlays = [ inputs.sfd-nix.overlays.default ];
 environment.systemPackages = [ pkgs.sing-box-for-desktop ];
 ```
 
-Using only the overlay does not configure the privileged daemon. Prefer the NixOS module for a complete installation.
+On Linux, using only the overlay does not configure the privileged daemon;
+prefer the NixOS module for a complete installation. On Darwin, prefer the
+upstream installer as described above.
 
 ## Development
 
@@ -185,15 +218,19 @@ runs the native flake checks, then pushes both release closures to the cache.
 
 Useful outputs are:
 
-- `packages.<system>.sing-box-for-desktop` — the complete desktop package
-- `packages.<system>.sing-box-daemon` — the matching `boxdd` daemon
-- `nixosModules.default` — declarative desktop/service integration
+- `packages.<linux-system>.sing-box-for-desktop` — the Linux desktop package
+- `packages.<linux-system>.sing-box-daemon` — the matching Linux `boxdd` daemon
+- `packages.aarch64-darwin.sing-box-for-apple` — the signed Apple client and installer
+- `packages.aarch64-darwin.sing-box-for-desktop` — alias for the Apple client
+- `nixosModules.default` — Linux-only declarative desktop/service integration
 - `overlays.default` — the package overlay
 
-Run `just check` (or `nix flake check --accept-flake-config`) to build both
-package outputs. The Electron UI, both pnpm dependency graphs, the Go daemon,
-and Cronet are built or fetched through fixed-output Nix derivations; the build
-does not download upstream `.deb` or RPM artifacts.
+On Linux, run `just check` (or `nix flake check --accept-flake-config`) to build
+the desktop and daemon outputs. The Electron UI, both pnpm dependency graphs,
+the Go daemon, and Cronet are built or fetched through fixed-output Nix
+derivations; the Linux build does not download upstream `.deb` or RPM
+artifacts. The Darwin output repacks the official Apple installer for the
+signing reasons described above.
 
 ## License
 

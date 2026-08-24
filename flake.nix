@@ -1,5 +1,5 @@
 {
-  description = "sfd-nix: Nix packaging for sing-box-for-desktop";
+  description = "sfd-nix: Nix packaging for the sing-box desktop clients";
 
   nixConfig = {
     extra-substituters = [ "https://sfd-nix.cachix.org" ];
@@ -13,17 +13,21 @@
   outputs =
     { self, nixpkgs }:
     let
-      supportedSystems = [
+      linuxSystems = [
         "x86_64-linux"
         "aarch64-linux"
       ];
+      darwinSystems = [ "aarch64-darwin" ];
+      supportedSystems = linuxSystems ++ darwinSystems;
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
       packageFor =
         system:
         let
           pkgs = import nixpkgs { inherit system; };
         in
-        pkgs.callPackage ./package.nix { };
+        pkgs.callPackage (
+          if pkgs.stdenv.hostPlatform.isDarwin then ./package-darwin.nix else ./package.nix
+        ) { };
     in
     {
       packages = forAllSystems (
@@ -31,11 +35,18 @@
         let
           package = packageFor system;
         in
-        {
-          default = package;
-          sing-box-for-desktop = package;
-          sing-box-daemon = package.passthru.daemon;
-        }
+        if nixpkgs.lib.hasSuffix "-darwin" system then
+          {
+            default = package;
+            sing-box-for-apple = package;
+            sing-box-for-desktop = package;
+          }
+        else
+          {
+            default = package;
+            sing-box-for-desktop = package;
+            sing-box-daemon = package.passthru.daemon;
+          }
       );
 
       checks = forAllSystems (
@@ -43,22 +54,34 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
         in
-        {
-          package = self.packages.${system}.sing-box-for-desktop;
-          daemon = self.packages.${system}.sing-box-daemon;
-          module = pkgs.callPackage ./tests/module-check.nix {
-            nixosModule = ./nixos-module.nix;
-            inherit (nixpkgs.lib) nixosSystem;
+        if pkgs.stdenv.hostPlatform.isDarwin then
+          { package = self.packages.${system}.sing-box-for-apple; }
+        else
+          {
             package = self.packages.${system}.sing-box-for-desktop;
-          };
-        }
+            daemon = self.packages.${system}.sing-box-daemon;
+            module = pkgs.callPackage ./tests/module-check.nix {
+              nixosModule = ./nixos-module.nix;
+              inherit (nixpkgs.lib) nixosSystem;
+              package = self.packages.${system}.sing-box-for-desktop;
+            };
+          }
       );
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
 
-      overlays.default = final: _prev: {
-        sing-box-for-desktop = final.callPackage ./package.nix { };
-      };
+      overlays.default =
+        final: _prev:
+        let
+          isDarwin = final.stdenv.hostPlatform.isDarwin;
+          package = final.callPackage (if isDarwin then ./package-darwin.nix else ./package.nix) { };
+        in
+        {
+          sing-box-for-desktop = package;
+        }
+        // nixpkgs.lib.optionalAttrs isDarwin {
+          sing-box-for-apple = package;
+        };
 
       nixosModules.default =
         { lib, pkgs, ... }:
