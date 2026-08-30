@@ -1,6 +1,10 @@
 /result
 /result-*
 /.direnv
+
+# Pi local state; keep the project MCP configuration tracked.
+/.pi/*
+!/.pi/mcp.json
 /.envrc.local
 
 # Devenv

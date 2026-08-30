@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "nixos": {
+      "command": "uvx",
+      "args": ["mcp-nixos"],
+      "requestTimeoutMs": 120000
+    }
+  }
+}
