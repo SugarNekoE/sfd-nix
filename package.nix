@@ -43,13 +43,13 @@ let
   );
   pnpm = pnpm_11.override { nodejs-slim = nodejs-slim_26; };
   daemon = callPackage ./sing-box-daemon.nix { };
-  version = "1.14.0-rc.1";
+  version = "1.14.0";
   source = fetchFromGitHub {
     owner = "SagerNet";
     repo = "sing-box-for-desktop";
-    rev = "f02201df1415667e7e0e65116746c1989d958f7e";
+    rev = "92b69e160d30249e8fc21a1106df6af538f0fb92";
     fetchSubmodules = true;
-    hash = "sha256-DzCX3EtOHwD6FosvAmh9MM2aVYMgvxUz5yi+4F0GEEQ=";
+    hash = "sha256-f3oQG9laLWCiKYR+1yBeWwZMvsyQdh3WtEs/sSO0zGM=";
   };
   dashboardPnpmDeps = fetchPnpmDeps {
     pname = "sing-box-for-desktop-dashboard";
@@ -96,7 +96,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   env = {
     ELECTRON_SKIP_BINARY_DOWNLOAD = 1;
-    SOURCE_DATE_EPOCH = "1787538698";
+    SOURCE_DATE_EPOCH = "1788137407";
   };
 
   # The dependency FOD enforces upstream's release-age and trust policies while
