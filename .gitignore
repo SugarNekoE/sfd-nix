@@ -17,3 +17,7 @@ devenv.local.yaml
 
 # pre-commit
 .pre-commit-config.yaml
+
+# env files
+.env
+.env.local
