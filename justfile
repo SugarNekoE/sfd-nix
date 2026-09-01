@@ -1,6 +1,6 @@
 set shell := ["bash", "-euo", "pipefail", "-c"]
 
-export CACHIX_CACHE_NAME := env_var_or_default("CACHIX_CACHE_NAME", "sfd-nix")
+export CACHIX_CACHE_NAME := env("CACHIX_CACHE_NAME", "sfd-nix")
 
 # List available recipes.
 default:
