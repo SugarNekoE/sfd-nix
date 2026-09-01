@@ -10,6 +10,9 @@ in
     cachix
     just
     uv
+    yaml-language-server
+    package-version-server
+    vscode-json-languageserver
   ];
 
   cachix.push = cachixCacheName;
