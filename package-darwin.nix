@@ -9,11 +9,11 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "sing-box-for-apple";
-  version = "1.14.0";
+  version = "1.14.2";
 
   src = fetchurl {
     url = "https://github.com/SagerNet/sing-box/releases/download/v${finalAttrs.version}/SFM-${finalAttrs.version}-Apple.pkg";
-    hash = "sha256-aP3lMwbzKqzS1NDvDy6grib4JgHGLDiatT3BVPtUqUw=";
+    hash = "sha256-H5Te8So+/LkUhhyEctPypooYFCxZ9OaeFVe5BCMiM8Y=";
   };
 
   dontUnpack = true;
@@ -57,7 +57,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   passthru = {
     installer = finalAttrs.src;
-    sourceRevision = "59540eb0e1812bb76a481a9dc3dec6a788f4196f";
+    sourceRevision = "742a6d5e25c9f4f8b91773f0f7e516c1c850e46b";
   };
 
   meta = {

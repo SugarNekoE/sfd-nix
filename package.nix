@@ -3,6 +3,7 @@
   stdenv,
   callPackage,
   copyDesktopItems,
+  cronet-go,
   electron_43-bin,
   fetchFromGitHub,
   fetchPnpmDeps,
@@ -42,14 +43,14 @@ let
     }
   );
   pnpm = pnpm_11.override { nodejs-slim = nodejs-slim_26; };
-  daemon = callPackage ./sing-box-daemon.nix { };
-  version = "1.14.0";
+  daemon = callPackage ./sing-box-daemon.nix { inherit cronet-go; };
+  version = "1.14.2";
   source = fetchFromGitHub {
     owner = "SagerNet";
     repo = "sing-box-for-desktop";
-    rev = "92b69e160d30249e8fc21a1106df6af538f0fb92";
+    rev = "32f915ba595601dbc2dd346c33fe9fedd3e72979";
     fetchSubmodules = true;
-    hash = "sha256-f3oQG9laLWCiKYR+1yBeWwZMvsyQdh3WtEs/sSO0zGM=";
+    hash = "sha256-+Kwe5ZBJSzwanGZXauEtLgWUPQN5z3cRtVhAbZa/pCU=";
   };
   dashboardPnpmDeps = fetchPnpmDeps {
     pname = "sing-box-for-desktop-dashboard";
@@ -83,7 +84,7 @@ stdenv.mkDerivation (finalAttrs: {
       ;
     inherit pnpm;
     fetcherVersion = 4;
-    hash = "sha256-MJdf1+aTWCmS0l9XO7pAne3ErXhxGmT5xoriSLIUXEk=";
+    hash = "sha256-bW2FEQchZjJKin42Huv7cUc+G3oQGnn5kkk7UTeMlbY=";
   };
 
   nativeBuildInputs = [
@@ -96,7 +97,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   env = {
     ELECTRON_SKIP_BINARY_DOWNLOAD = 1;
-    SOURCE_DATE_EPOCH = "1788137407";
+    SOURCE_DATE_EPOCH = "1790247133";
   };
 
   # The dependency FOD enforces upstream's release-age and trust policies while
@@ -210,7 +211,7 @@ stdenv.mkDerivation (finalAttrs: {
   passthru = {
     inherit daemon dashboardPnpmDeps;
     sourceRevision = finalAttrs.src.rev;
-    dashboardRevision = "564dd76b2382af2fb72aee9fcc95af75db693d1a";
+    dashboardRevision = "9c498355c9973187b04c09991e2aca8100fd00ec";
   };
 
   meta = {

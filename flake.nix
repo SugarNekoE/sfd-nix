@@ -9,9 +9,18 @@
   };
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/master";
+  # sing-box 1.14.2 requires cronet-go with the 4-argument
+  # Cronet_Engine_SetUdpDialer ABI. The nixpkgs pin above predates that, so this
+  # input supplies only the matching prebuilt cronet-go to the daemon while the
+  # desktop toolchain (Node.js 26.7, pnpm 11.21, Electron 43.4) stays pinned.
+  inputs.nixpkgs-cronet.url = "github:NixOS/nixpkgs/master";
 
   outputs =
-    { self, nixpkgs }:
+    {
+      self,
+      nixpkgs,
+      nixpkgs-cronet,
+    }:
     let
       linuxSystems = [
         "x86_64-linux"
@@ -25,9 +34,12 @@
         let
           pkgs = import nixpkgs { inherit system; };
         in
-        pkgs.callPackage (
-          if pkgs.stdenv.hostPlatform.isDarwin then ./package-darwin.nix else ./package.nix
-        ) { };
+        if pkgs.stdenv.hostPlatform.isDarwin then
+          pkgs.callPackage ./package-darwin.nix { }
+        else
+          pkgs.callPackage ./package.nix {
+            cronet-go = nixpkgs-cronet.legacyPackages.${system}.cronet-go;
+          };
     in
     {
       packages = forAllSystems (
@@ -74,7 +86,14 @@
         final: _prev:
         let
           isDarwin = final.stdenv.hostPlatform.isDarwin;
-          package = final.callPackage (if isDarwin then ./package-darwin.nix else ./package.nix) { };
+          system = final.stdenv.hostPlatform.system;
+          package =
+            if isDarwin then
+              final.callPackage ./package-darwin.nix { }
+            else
+              final.callPackage ./package.nix {
+                cronet-go = nixpkgs-cronet.legacyPackages.${system}.cronet-go;
+              };
         in
         {
           sing-box-for-desktop = package;

@@ -16,9 +16,26 @@
         "type": "github"
       }
     },
+    "nixpkgs-cronet": {
+      "locked": {
+        "lastModified": 1790605008,
+        "narHash": "sha256-mbMHR2jOFEHpBDtAPKdbFdPsz5T3m/9gANJDWhBcuPY=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "e71f1aa922d90b3f5b01a68c00f685711e307412",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "master",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "nixpkgs-cronet": "nixpkgs-cronet"
       }
     }
   },
