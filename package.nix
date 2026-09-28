@@ -17,7 +17,7 @@
 }:
 
 let
-  electronVersion = "43.4.0";
+  electronVersion = "43.4.1";
   electronPlatform =
     {
       x86_64-linux = "linux-x64";
@@ -26,8 +26,8 @@ let
     .${stdenv.hostPlatform.system};
   electronHash =
     {
-      x86_64-linux = "7c5f7918bcae74a05a814543940eb28469c055edaa3cfcf41d0ff1787b314c52";
-      aarch64-linux = "17021d48739857106a26dd95bf749f95b89ae924955c3c7e7ff5a3f06251ac14";
+      x86_64-linux = "79d4efd69f0ccf1fc11891ea5075329c7b3faddad79a08d9fb395bbd63169acf";
+      aarch64-linux = "9e2b5cfbd387e138f06c7bb19b399bb3ee487dbb4110215df097d94e80431892";
     }
     .${stdenv.hostPlatform.system};
   electron = electron_43-bin.overrideAttrs (
