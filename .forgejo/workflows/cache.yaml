@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    runs-on: acs-nix
+    runs-on: nixos-latest
     env:
       NIX_CONFIG: "experimental-features = nix-command flakes"
     steps:
