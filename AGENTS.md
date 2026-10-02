@@ -2,12 +2,9 @@
 
 ## Parallel Work and Git Worktrees
 
-- Windi explicitly permits the lead agent to run multiple sub-agents
-  concurrently for independent, bounded jobs when parallel execution materially
-  helps the task.
 - Give every sub-agent a concrete scope and exclusive file ownership. Keep
   dependent work sequential and never let multiple writers edit the same path.
-- Use a dedicated `codex/<task>` branch and Git worktree for each parallel writer
+- Use a dedicated branch and Git worktree for each parallel writer
   once the shared baseline is committed and clean.
 - Before that baseline exists, parallelize read-only analysis or assign writers
   disjoint paths in the primary worktree; never let two agents edit one file.
