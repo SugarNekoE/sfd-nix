@@ -10,18 +10,14 @@
   fetchurl,
   makeDesktopItem,
   makeWrapper,
-  nodejs_26,
   nodejs-slim_26,
   pnpm_11,
   pnpmConfigHook,
 }:
 
 let
-  # Electron 43.4.1 registers its status icon as
-  # "<well-known bus name>/StatusNotifierItem/<n>", which KDE's
-  # StatusNotifierWatcher rejects as a service name, so the tray icon never
-  # appears. 43.7.x restores the bus-name-only registration while staying
-  # within upstream's "^43.4.1" range.
+  # 43.4.1 breaks the KDE tray icon (invalid StatusNotifierItem service name);
+  # 43.7.x fixes it within upstream's "^43.4.1" range.
   electronVersion = "43.7.7";
   electronPlatform =
     {
@@ -95,19 +91,20 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     copyDesktopItems
     makeWrapper
-    nodejs_26
+    nodejs-slim_26
     pnpm
     pnpmConfigHook
   ];
+
+  disallowedReferences = [ nodejs-slim_26 ];
 
   env = {
     ELECTRON_SKIP_BINARY_DOWNLOAD = 1;
     SOURCE_DATE_EPOCH = "1790247133";
   };
 
-  # The dependency FOD enforces upstream's release-age and trust policies while
-  # it has registry access. The actual build then trusts that verified lockfile
-  # so pnpm does not try to re-fetch registry metadata in the offline sandbox.
+  # The dependency FOD already enforced upstream's trust policies; skip
+  # re-checking them against the registry in the offline build.
   postPatch = ''
     cp ${./files/managedConfiguration.ts} src/main/managedConfiguration.ts
 
@@ -144,6 +141,10 @@ stdenv.mkDerivation (finalAttrs: {
     popd
 
     pnpm exec electron-vite build
+
+    # Keep patchShebangs' build-time node out of the runtime closure via app.asar.
+    grep -rlIZ --exclude-dir=.bin -F "#!${nodejs-slim_26}/bin/node" node_modules \
+      | xargs -0 -r sed -i "1s|^#!${nodejs-slim_26}/bin/node|#!/usr/bin/env node|"
 
     install -Dm755 ${lib.getExe daemon} bin/sing-box-daemon
     cp -r ${electron.dist} electron-dist
