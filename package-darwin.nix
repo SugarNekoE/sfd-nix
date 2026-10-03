@@ -51,8 +51,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     runHook postInstall
   '';
 
-  # Rewriting Mach-O files would invalidate upstream's signatures. The app,
-  # system extension, and privileged helper must remain byte-for-byte intact.
+  # Rewriting Mach-O files would invalidate upstream's signatures.
   dontFixup = true;
 
   passthru = {

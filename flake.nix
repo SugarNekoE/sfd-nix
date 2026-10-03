@@ -9,10 +9,8 @@
   };
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/master";
-  # sing-box 1.14.2 requires cronet-go with the 4-argument
-  # Cronet_Engine_SetUdpDialer ABI. The nixpkgs pin above predates that, so this
-  # input supplies only the matching prebuilt cronet-go to the daemon while the
-  # desktop toolchain (Node.js 26.7, pnpm 11.21, Electron 43.7) stays pinned.
+  # Newer pin supplying only cronet-go, which sing-box 1.14.2 needs for the
+  # 4-argument Cronet_Engine_SetUdpDialer ABI.
   inputs.nixpkgs-cronet.url = "github:NixOS/nixpkgs/master";
 
   outputs =
@@ -29,17 +27,15 @@
       darwinSystems = [ "aarch64-darwin" ];
       supportedSystems = linuxSystems ++ darwinSystems;
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
-      packageFor =
-        system:
-        let
-          pkgs = import nixpkgs { inherit system; };
-        in
+      mkPackage =
+        pkgs:
         if pkgs.stdenv.hostPlatform.isDarwin then
           pkgs.callPackage ./package-darwin.nix { }
         else
           pkgs.callPackage ./package.nix {
-            cronet-go = nixpkgs-cronet.legacyPackages.${system}.cronet-go;
+            cronet-go = nixpkgs-cronet.legacyPackages.${pkgs.stdenv.hostPlatform.system}.cronet-go;
           };
+      packageFor = system: mkPackage nixpkgs.legacyPackages.${system};
     in
     {
       packages = forAllSystems (
@@ -85,20 +81,12 @@
       overlays.default =
         final: _prev:
         let
-          isDarwin = final.stdenv.hostPlatform.isDarwin;
-          system = final.stdenv.hostPlatform.system;
-          package =
-            if isDarwin then
-              final.callPackage ./package-darwin.nix { }
-            else
-              final.callPackage ./package.nix {
-                cronet-go = nixpkgs-cronet.legacyPackages.${system}.cronet-go;
-              };
+          package = mkPackage final;
         in
         {
           sing-box-for-desktop = package;
         }
-        // nixpkgs.lib.optionalAttrs isDarwin {
+        // nixpkgs.lib.optionalAttrs final.stdenv.hostPlatform.isDarwin {
           sing-box-for-apple = package;
         };
 
