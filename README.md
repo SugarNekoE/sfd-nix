@@ -17,7 +17,7 @@ nix run --accept-flake-config .
 ```
 
 On `x86_64-linux` and `aarch64-linux`, the package uses the upstream-matched
-Node.js 26.7, Electron 43.4, and sing-box 1.14.2 toolchain. The following
+Node.js 26.7, Electron 43.7, and sing-box 1.14.2 toolchain. The following
 NixOS module and declarative settings apply only to this Linux package.
 
 The standalone package contains the UI and its matching daemon, but a normal user cannot install the required system service. On NixOS, use the module for a working client:

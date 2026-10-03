@@ -12,7 +12,7 @@
   # sing-box 1.14.2 requires cronet-go with the 4-argument
   # Cronet_Engine_SetUdpDialer ABI. The nixpkgs pin above predates that, so this
   # input supplies only the matching prebuilt cronet-go to the daemon while the
-  # desktop toolchain (Node.js 26.7, pnpm 11.21, Electron 43.4) stays pinned.
+  # desktop toolchain (Node.js 26.7, pnpm 11.21, Electron 43.7) stays pinned.
   inputs.nixpkgs-cronet.url = "github:NixOS/nixpkgs/master";
 
   outputs =

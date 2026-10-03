@@ -17,7 +17,12 @@
 }:
 
 let
-  electronVersion = "43.4.1";
+  # Electron 43.4.1 registers its status icon as
+  # "<well-known bus name>/StatusNotifierItem/<n>", which KDE's
+  # StatusNotifierWatcher rejects as a service name, so the tray icon never
+  # appears. 43.7.x restores the bus-name-only registration while staying
+  # within upstream's "^43.4.1" range.
+  electronVersion = "43.7.7";
   electronPlatform =
     {
       x86_64-linux = "linux-x64";
@@ -26,8 +31,8 @@ let
     .${stdenv.hostPlatform.system};
   electronHash =
     {
-      x86_64-linux = "79d4efd69f0ccf1fc11891ea5075329c7b3faddad79a08d9fb395bbd63169acf";
-      aarch64-linux = "9e2b5cfbd387e138f06c7bb19b399bb3ee487dbb4110215df097d94e80431892";
+      x86_64-linux = "4d0a48398c444258dbcf2f5f83b49ca5bc53583130f354e0c299dad5b22b5271";
+      aarch64-linux = "16071038a9677d0f00b11d3d0f0b7b4ea3250987727aa73aa563b87789f2d5ab";
     }
     .${stdenv.hostPlatform.system};
   electron = electron_43-bin.overrideAttrs (
