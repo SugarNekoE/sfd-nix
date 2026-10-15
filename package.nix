@@ -59,7 +59,7 @@ let
     src = source;
     sourceRoot = "source/dashboard";
     fetcherVersion = 4;
-    hash = "sha256-cgCKaNYNwaxV4Am6rpoROV3AU66U9tCsaev1XzL1qbE=";
+    hash = "sha256-MCld/J2LBtAz2bS00ICjCQN/QPXlLDKwzEGtFwlEl8c=";
   };
 in
 stdenv.mkDerivation (finalAttrs: {
