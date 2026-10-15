@@ -5,9 +5,9 @@ This flake packages the official sing-box desktop clients:
 - [SagerNet/sing-box-for-desktop](https://github.com/SagerNet/sing-box-for-desktop) on Linux
 - [SagerNet/sing-box-for-apple](https://github.com/SagerNet/sing-box-for-apple) on macOS
 
-Both packages match sing-box `1.14.2`. The Linux client is pinned to
-revision `32f915ba595601dbc2dd346c33fe9fedd3e72979`; the Apple client matches
-revision `742a6d5e25c9f4f8b91773f0f7e516c1c850e46b`.
+Both packages match sing-box `1.14.3`. The Linux client is pinned to
+revision `50f503849148dd73fa4f4bc231119acf5b2f3d7a`; the Apple client matches
+revision `e232aaf22d6d68773196ffc8e6e79684a6be717c`.
 
 ## Run or build
 
@@ -17,7 +17,7 @@ nix run --accept-flake-config .
 ```
 
 On `x86_64-linux` and `aarch64-linux`, the package uses the upstream-matched
-Node.js 26.7, Electron 43.7, and sing-box 1.14.2 toolchain. The following
+Node.js 26.7, Electron 43.7, and sing-box 1.14.3 toolchain. The following
 NixOS module and declarative settings apply only to this Linux package.
 
 The standalone package contains the UI and its matching daemon, but a normal user cannot install the required system service. On NixOS, use the module for a working client:

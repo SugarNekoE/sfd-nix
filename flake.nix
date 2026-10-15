@@ -9,7 +9,7 @@
   };
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/master";
-  # Newer pin supplying only cronet-go, which sing-box 1.14.2 needs for the
+  # Newer pin supplying only cronet-go, which sing-box 1.14.3 needs for the
   # 4-argument Cronet_Engine_SetUdpDialer ABI.
   inputs.nixpkgs-cronet.url = "github:NixOS/nixpkgs/master";
 

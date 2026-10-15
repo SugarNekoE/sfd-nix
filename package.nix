@@ -45,13 +45,13 @@ let
   );
   pnpm = pnpm_11.override { nodejs-slim = nodejs-slim_26; };
   daemon = callPackage ./sing-box-daemon.nix { inherit cronet-go; };
-  version = "1.14.2";
+  version = "1.14.3";
   source = fetchFromGitHub {
     owner = "SagerNet";
     repo = "sing-box-for-desktop";
-    rev = "32f915ba595601dbc2dd346c33fe9fedd3e72979";
+    rev = "50f503849148dd73fa4f4bc231119acf5b2f3d7a";
     fetchSubmodules = true;
-    hash = "sha256-+Kwe5ZBJSzwanGZXauEtLgWUPQN5z3cRtVhAbZa/pCU=";
+    hash = "sha256-IGLLrQJzld+I1+wCI+LfM3RdbZ3X8NQiFh46Q7vwcTQ=";
   };
   dashboardPnpmDeps = fetchPnpmDeps {
     pname = "sing-box-for-desktop-dashboard";
@@ -59,7 +59,7 @@ let
     src = source;
     sourceRoot = "source/dashboard";
     fetcherVersion = 4;
-    hash = "sha256-MCld/J2LBtAz2bS00ICjCQN/QPXlLDKwzEGtFwlEl8c=";
+    hash = "sha256-cgCKaNYNwaxV4Am6rpoROV3AU66U9tCsaev1XzL1qbE=";
   };
 in
 stdenv.mkDerivation (finalAttrs: {
@@ -85,7 +85,7 @@ stdenv.mkDerivation (finalAttrs: {
       ;
     inherit pnpm;
     fetcherVersion = 4;
-    hash = "sha256-bW2FEQchZjJKin42Huv7cUc+G3oQGnn5kkk7UTeMlbY=";
+    hash = "sha256-B1OB/QMd7yK7Z7u6q5OugmiOUOSH2Tl094bwM0R5ZzA=";
   };
 
   nativeBuildInputs = [
@@ -217,7 +217,7 @@ stdenv.mkDerivation (finalAttrs: {
   passthru = {
     inherit daemon dashboardPnpmDeps;
     sourceRevision = finalAttrs.src.rev;
-    dashboardRevision = "9c498355c9973187b04c09991e2aca8100fd00ec";
+    dashboardRevision = "f231354bc786dfcffcf09f6ec771bc5683050194";
   };
 
   meta = {
