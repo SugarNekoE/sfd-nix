@@ -13,6 +13,7 @@ jobs:
   build:
     runs-on: nixos-latest
     timeout-minutes: 180
+    enable-openid-connect: true
     env:
       CACHIX_AUTH_TOKEN: "${{ secrets.CACHIX_AUTH_TOKEN }}"
     steps:
@@ -21,6 +22,13 @@ jobs:
         run: |
           if [ -z "$CACHIX_AUTH_TOKEN" ]; then
             echo "CACHIX_AUTH_TOKEN is not configured" >&2
+            exit 1
+          fi
+      - name: Verify Forgejo OIDC token access
+        shell: sh
+        run: |
+          if [ -z "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ] || [ -z "${ACTIONS_ID_TOKEN_REQUEST_TOKEN:-}" ]; then
+            echo "Forgejo OIDC is not enabled for this job" >&2
             exit 1
           fi
       - name: Install Node.js action runtime
@@ -46,3 +54,28 @@ jobs:
 
           cachix_path="$(nix build --inputs-from . --no-link --print-out-paths nixpkgs#cachix)"
           printf '%s\n' "$outputs" | "$cachix_path/bin/cachix" push sfd-nix
+      - name: Push release outputs to niks3
+        shell: bash
+        env:
+          NIKS3_SERVER_URL: https://amber.asnk.io
+        run: |
+          set -euo pipefail
+
+          outputs_text="$(nix build --accept-flake-config --no-link --print-out-paths \
+            .#sing-box-for-desktop \
+            .#sing-box-daemon)"
+          mapfile -t outputs <<< "$outputs_text"
+
+          curl_path="$(nix build --inputs-from . --no-link --print-out-paths nixpkgs#curl.bin)"
+          jq_path="$(nix build --inputs-from . --no-link --print-out-paths nixpkgs#jq.bin)"
+          niks3_path="$(nix build --inputs-from . --no-link --print-out-paths nixpkgs#niks3)"
+
+          # mktemp creates the file with mode 0600.
+          token_file="$(mktemp)"
+          trap 'rm -f "$token_file"' EXIT
+          "$curl_path/bin/curl" -fsS \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$NIKS3_SERVER_URL" \
+            | "$jq_path/bin/jq" -er .value > "$token_file"
+
+          "$niks3_path/bin/niks3" push --auth-token-path "$token_file" "${outputs[@]}"
