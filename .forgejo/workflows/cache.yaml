@@ -39,6 +39,10 @@ jobs:
           echo "$node_path/bin" >> "$FORGEJO_PATH"
       - name: Check out repository
         uses: actions/checkout@v6
+      - name: Configure niks3 cache
+        uses: https://github.com/Mic92/niks3-action@v1
+        with:
+          server-url: https://amber.asnk.io
       - name: Evaluate every supported system
         run: nix flake check --accept-flake-config --all-systems --no-build
       - name: Build checks and push release outputs
@@ -54,28 +58,3 @@ jobs:
 
           cachix_path="$(nix build --inputs-from . --no-link --print-out-paths nixpkgs#cachix)"
           printf '%s\n' "$outputs" | "$cachix_path/bin/cachix" push sfd-nix
-      - name: Push release outputs to niks3
-        shell: bash
-        env:
-          NIKS3_SERVER_URL: https://amber.asnk.io
-        run: |
-          set -euo pipefail
-
-          outputs_text="$(nix build --accept-flake-config --no-link --print-out-paths \
-            .#sing-box-for-desktop \
-            .#sing-box-daemon)"
-          mapfile -t outputs <<< "$outputs_text"
-
-          curl_path="$(nix build --inputs-from . --no-link --print-out-paths nixpkgs#curl.bin)"
-          jq_path="$(nix build --inputs-from . --no-link --print-out-paths nixpkgs#jq.bin)"
-          niks3_path="$(nix build --inputs-from . --no-link --print-out-paths nixpkgs#niks3)"
-
-          # mktemp creates the file with mode 0600.
-          token_file="$(mktemp)"
-          trap 'rm -f "$token_file"' EXIT
-          "$curl_path/bin/curl" -fsS \
-            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$NIKS3_SERVER_URL" \
-            | "$jq_path/bin/jq" -er .value > "$token_file"
-
-          "$niks3_path/bin/niks3" push --auth-token-path "$token_file" "${outputs[@]}"
